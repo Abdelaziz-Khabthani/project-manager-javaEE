@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PROCESS model-entity="JSFProcess">
+ <PROCESS-ITEM NAME="rules:#index.xhtml" PATH="/index.xhtml"
+  SHAPE="544,240,50,121" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#project#addproject.xhtml"
+  PATH="/project/addproject.xhtml" SHAPE="752,145,0,0" model-entity="JSFProcessGroup">
+  <PROCESS-ITEM ID="rules:#project#addproject.xhtml:0" NAME="item"
+   PATH="/project/addproject.xhtml" model-entity="JSFProcessItem">
+   <PROCESS-ITEM-OUTPUT
+    ID="sucess:#{projectManagedBean.addProject()}:#project#listproject.xhtml"
+    NAME="output" PATH="/project/listproject.xhtml"
+    TARGET="rules:#project#listproject.xhtml"
+    TITLE="#{projectManagedBean.addProject()}:sucess" model-entity="JSFProcessItemOutput"/>
+  </PROCESS-ITEM>
+ </PROCESS-ITEM>
+ <PROCESS-ITEM NAME="rules:#employee#addemployee.xhtml"
+  PATH="/employee/addemployee.xhtml" SHAPE="752,529,0,0" model-entity="JSFProcessGroup">
+  <PROCESS-ITEM ID="rules:#employee#addemployee.xhtml:0" NAME="item"
+   PATH="/employee/addemployee.xhtml" model-entity="JSFProcessItem">
+   <PROCESS-ITEM-OUTPUT
+    ID="sucess:#{employeeManagedBean.addEmployee()}:#employee#listemployee.xhtml"
+    NAME="output" PATH="/employee/listemployee.xhtml"
+    TARGET="rules:#employee#listemployee.xhtml"
+    TITLE="#{employeeManagedBean.addEmployee()}:sucess" model-entity="JSFProcessItemOutput"/>
+  </PROCESS-ITEM>
+ </PROCESS-ITEM>
+ <PROCESS-ITEM NAME="rules:#employee#listemployee.xhtml"
+  PATH="/employee/listemployee.xhtml" SHAPE="736,529,0,0" model-entity="JSFProcessGroup">
+  <PROCESS-ITEM ID="rules:#employee#listemployee.xhtml:0" NAME="item"
+   PATH="/employee/listemployee.xhtml" model-entity="JSFProcessItem">
+   <PROCESS-ITEM-OUTPUT
+    ID="#employee#addemployee::#employee#addemployee.xhtml"
+    NAME="output1" PATH="/employee/addemployee.xhtml"
+    TARGET="rules:#employee#addemployee.xhtml"
+    TITLE="/employee/addemployee" model-entity="JSFProcessItemOutput"/>
+  </PROCESS-ITEM>
+ </PROCESS-ITEM>
+ <PROCESS-ITEM NAME="rules:#project#listproject.xhtml"
+  PATH="/project/listproject.xhtml" SHAPE="736,33,0,0" model-entity="JSFProcessGroup">
+  <PROCESS-ITEM ID="rules:#project#listproject.xhtml:0" NAME="item"
+   PATH="/project/listproject.xhtml" model-entity="JSFProcessItem">
+   <PROCESS-ITEM-OUTPUT
+    ID="#project#addproject:#{navigationManagedBean.processAddProjectPage()}:#project#addproject.xhtml"
+    NAME="output1" PATH="/project/addproject.xhtml"
+    TARGET="rules:#project#addproject.xhtml"
+    TITLE="#{navigationManagedBean.processAddProjectPage()}:/project/addproject" model-entity="JSFProcessItemOutput"/>
+  </PROCESS-ITEM>
+ </PROCESS-ITEM>
+ <PROCESS-ITEM NAME="rules:#project#listprojecttypes.xhtml"
+  PATH="/project/listprojecttypes.xhtml" SHAPE="736,257,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#employee#listjobpositions.xhtml"
+  PATH="/employee/listjobpositions.xhtml" SHAPE="736,529,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:*" PATH="*" SHAPE="240,289,0,0" model-entity="JSFProcessGroup">
+  <PROCESS-ITEM ID="rules:*:0" NAME="item" PATH="*" model-entity="JSFProcessItem">
+   <PROCESS-ITEM-OUTPUT
+    ID="#employee#addemployee:#{navigationManagedBean.processAddEmployeePage()}:#employee#addemployee.xhtml"
+    NAME="output" PATH="/employee/addemployee.xhtml"
+    TARGET="rules:#employee#addemployee.xhtml"
+    TITLE="#{navigationManagedBean.processAddEmployeePage()}:/employee/addemployee" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT
+    ID="#project#addproject:#{navigationManagedBean.processAddProjectPage()}:#project#addproject.xhtml"
+    NAME="output1" PATH="/project/addproject.xhtml"
+    TARGET="rules:#project#addproject.xhtml"
+    TITLE="#{navigationManagedBean.processAddProjectPage()}:/project/addproject" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT
+    ID="#employee#listemployee:#{navigationManagedBean.processListEmployeePage()}:#employee#listemployee.xhtml"
+    NAME="output2" PATH="/employee/listemployee.xhtml"
+    TARGET="rules:#employee#listemployee.xhtml"
+    TITLE="#{navigationManagedBean.processListEmployeePage()}:/employee/listemployee" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT
+    ID="#project#listproject:#{navigationManagedBean.processListProjectPage()}:#project#listproject.xhtml"
+    NAME="output3" PATH="/project/listproject.xhtml"
+    TARGET="rules:#project#listproject.xhtml"
+    TITLE="#{navigationManagedBean.processListProjectPage()}:/project/listproject" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT
+    ID="#project#listprojecttypes:#{navigationManagedBean.processProjectTypePage()}:#project#listprojecttypes.xhtml"
+    NAME="output4" PATH="/project/listprojecttypes.xhtml"
+    TARGET="rules:#project#listprojecttypes.xhtml"
+    TITLE="#{navigationManagedBean.processProjectTypePage()}:/project/listprojecttypes" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT
+    ID="#employee#listjobpositions:#{navigationManagedBean.processJobPositionPage()}:#employee#listjobpositions.xhtml"
+    NAME="output5" PATH="/employee/listjobpositions.xhtml"
+    TARGET="rules:#employee#listjobpositions.xhtml"
+    TITLE="#{navigationManagedBean.processJobPositionPage()}:/employee/listjobpositions" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="index::#index.xhtml" NAME="output6"
+    PATH="/index.xhtml" TARGET="rules:#index.xhtml" TITLE="index" model-entity="JSFProcessItemOutput"/>
+  </PROCESS-ITEM>
+ </PROCESS-ITEM>
+ <PROCESS-ITEM NAME="rules:#login.xhtml" PATH="/login.xhtml"
+  SHAPE="480,545,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:*:1" PATH="*" SHAPE="240,561,0,0" model-entity="JSFProcessGroup">
+  <PROCESS-ITEM ID="rules:*:1" NAME="item" PATH="*" model-entity="JSFProcessItem">
+   <PROCESS-ITEM-OUTPUT ID="correct::#index.xhtml" NAME="output"
+    PATH="/index.xhtml" TARGET="rules:#index.xhtml" TITLE="correct" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="logout::#login.xhtml" NAME="output1"
+    PATH="/login.xhtml" TARGET="rules:#login.xhtml" TITLE="logout" model-entity="JSFProcessItemOutput"/>
+  </PROCESS-ITEM>
+ </PROCESS-ITEM>
+</PROCESS>

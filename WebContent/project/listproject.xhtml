@@ -1,0 +1,589 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pm="http://primefaces.org/mobile"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:sec="http://www.springframework.org/security/tags">
+<h:head>
+	<title>List Projects</title>
+</h:head>
+<h:body onload="#{projectManagedBean.projectAddedMessage()}">
+	<h:outputStylesheet name="css/style.css" />
+
+	<h:form id="logout">
+		<h:panelGrid columns="2">
+			<p:outputLabel value="Hello #{loginBean.fullUserName}!" />
+			<p:commandLink value="Logout" action="#{loginBean.logOut()}" />
+		</h:panelGrid>
+		<p:separator />
+	</h:form>
+
+	<p:messages id="messages" autoUpdate="true" closable="true"
+		globalOnly="true" />
+	<h:form>
+		<p:panel header="Search: " style="margin-bottom: 10px;" id="panel">
+			<h:panelGrid columns="6" border="0" id="p">
+				<p:outputLabel value="Search A Project: " />
+
+
+				<p:calendar id="searchStartDate"
+					value="#{projectManagedBean.keyWordDate}" pattern="dd-MM-yyyy"
+					mask="true"
+					rendered="#{(projectManagedBean.criteria == 'startdate') or (projectManagedBean.criteria == 'enddate')}"
+					placeholder="DD-MM-YYYY">
+					<p:ajax event="dateSelect"
+						listener="#{projectManagedBean.filterProject()}"
+						update="@(.mainform)" />
+					<p:ajax event="valueChange"
+						listener="#{projectManagedBean.filterProject()}"
+						update="@(.mainform)" />
+				</p:calendar>
+
+
+
+				<p:inputText id="search" value="#{projectManagedBean.keyWord}"
+					placeholder="Project's #{projectManagedBean.criteria}"
+					rendered="#{(projectManagedBean.criteria == 'id') or (projectManagedBean.criteria == 'name')}">
+					<p:ajax event="keyup"
+						listener="#{projectManagedBean.filterProject()}"
+						update="@(.mainform)" />
+				</p:inputText>
+
+
+
+				<p:selectOneMenu id="searchPt" value="#{projectManagedBean.keyWord}"
+					rendered="#{projectManagedBean.criteria == 'projecttype'}">
+					<p:ajax listener="#{projectManagedBean.filterProject()}"
+						update="@(.mainform)" />
+					<f:selectItem itemLabel="Select A Project Type" itemValue="" />
+					<f:selectItems value="#{projectManagedBean.projectTypes}" var="pt"
+						itemLabel="#{pt.projectTypeLabel}"
+						itemValue="#{pt.projectTypeLabel}" />
+				</p:selectOneMenu>
+
+
+
+				<p:selectOneMenu id="criteria"
+					value="#{projectManagedBean.criteria}">
+					<p:ajax listener="#{projectManagedBean.onCriteriaChange()}"
+						update="panel @(.mainform)" />
+					<f:selectItems value="#{projectManagedBean.criterias}" />
+				</p:selectOneMenu>
+			</h:panelGrid>
+			<p:selectBooleanCheckbox
+				value="#{projectManagedBean.onlyLiveProjects}" id="o">
+				<p:ajax update="@(.mainform)"
+					listener="#{projectManagedBean.filterProject}" />
+			</p:selectBooleanCheckbox>
+			<h:outputLabel value=" Show Only Live Projects" for="o" />
+		</p:panel>
+	</h:form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<h:form styleClass="mainform">
+		<p:dataTable id="projecttable" var="project"
+			value="#{projectManagedBean.listProject}" paginator="true"
+			paginatorPosition="bottom" rows="5"
+			paginatorTemplate="{PreviousPageLink} {PageLinks} {NextPageLink}"
+			rowStyleClass="#{project.projectEndDate le now ? 'red' : 'green'}"
+			emptyMessage="No Projects Found.">
+
+
+			<p:column headerText="Emloyees" style="width:80px">
+				<p:rowToggler />
+			</p:column>
+
+
+			<p:column headerText="Id">
+				<h:outputText value="#{project.projectId}" />
+			</p:column>
+
+
+			<p:column headerText="Name">
+				<h:outputText value="#{project.projectName}" />
+			</p:column>
+
+
+			<p:column headerText="Start Date">
+				<h:outputText value="#{project.projectStartDate}">
+					<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+				</h:outputText>
+			</p:column>
+
+			<p:column headerText="End Date">
+				<h:outputText value="#{project.projectEndDate}">
+					<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+				</h:outputText>
+			</p:column>
+
+
+			<p:column width="132" headerText="Actions">
+				<sec:authorize access="hasRole('ADMIN_ROLE')">
+					<p:commandButton id="remove"
+						actionListener="#{projectManagedBean.removeProject(project)}"
+						update="@(.mainform)" type="link" ajax="true" icon="ui-icon-trash"
+						style="height: 30px;" disabled="#{project.projectEndDate le now}">
+						<p:confirm header="Confirmation"
+							message="Continue removing this Project?" icon="ui-icon-alert" />
+					</p:commandButton>
+					<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+						<p:commandButton value="Yes" type="button"
+							styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+						<p:commandButton value="No" type="button"
+							styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+					</p:confirmDialog>
+
+				</sec:authorize>
+
+
+				<p:commandButton icon="ui-icon-search" update="@(.projectDialog)"
+					oncomplete="PF('projectDialog').show()" style="height: 30px;">
+					<f:setPropertyActionListener value="#{project}"
+						target="#{projectManagedBean.selectedProject}" />
+				</p:commandButton>
+
+
+				<sec:authorize access="hasRole('ADMIN_ROLE')">
+					<p:commandButton icon="ui-icon-pencil" update="@(.pc)"
+						oncomplete="PF('pw').show()" style="height: 30px;"
+						disabled="#{project.projectEndDate le now}">
+						<f:setPropertyActionListener value="#{project}"
+							target="#{projectManagedBean.selectedProject}" />
+						<f:setPropertyActionListener
+							value="#{project.projectType.projectTypeId}"
+							target="#{projectManagedBean.projectTypeId}" />
+					</p:commandButton>
+				</sec:authorize>
+			</p:column>
+
+
+
+
+
+
+
+
+
+
+
+
+			<p:rowExpansion>
+				<p:outputPanel
+					style="text-align: center; margin-top: 5px; font-weight:bold;">
+					<h:outputText value="Employees Working On This Project" />
+				</p:outputPanel>
+				<p:dataTable id="employeedatatable" value="#{project.employees}"
+					var="employee" rows="5" paginatorPosition="bottom"
+					paginatorTemplate="{PreviousPageLink} {PageLinks} {NextPageLink}"
+					emptyMessage="No Employees Working On this Project (Which is a little bit wierd dude)"
+					style="margin-top: 10px; margin-bottom: 10px;"
+					widgetVar="widgetAssigned" paginator="true" filteredValue="#{employeeManagedBean.tmpFiltredEmployees}">
+					<f:facet name="header">
+						<p:outputPanel
+							style="text-align: right; margin-top: 1px; margin-bottom: 1px;">
+							<h:outputText value="Search all fields:" />
+							<p:inputText id="globalFilter"
+								onkeyup="PF('widgetAssigned').filter()" style="width:150px"
+								placeholder="Enter keyword" />
+						</p:outputPanel>
+
+
+					</f:facet>
+					<p:column headerText="Id" filterBy="#{employee.employeeCin}"
+						filterStyle="display:none; visibility:hidden;">
+						<h:outputText value="#{employee.employeeCin}" />
+					</p:column>
+
+
+					<p:column headerText="Name" filterBy="#{employee.employeeName}"
+						filterStyle="display:none; visibility:hidden;">
+						<h:outputText value="#{employee.employeeName}" />
+					</p:column>
+
+
+					<p:column headerText="Last Name"
+						filterBy="#{employee.employeeLastname}"
+						filterStyle="display:none; visibility:hidden;">
+						<h:outputText value="#{employee.employeeLastname}" />
+					</p:column>
+
+
+
+					<p:column headerText="Job Position"
+						filterBy="#{employee.jobPosition.jobPositonLabel}"
+						filterStyle="display:none; visibility:hidden;">
+						<h:outputText value="#{employee.jobPosition.jobPositonLabel}" />
+					</p:column>
+
+
+
+					<p:column headerText="Birth Date">
+						<h:outputText value="#{employee.employeeBirthdate}">
+							<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+						</h:outputText>
+					</p:column>
+
+
+
+
+					<p:column width="88" headerText="Actions">
+						<sec:authorize access="hasRole('ADMIN_ROLE')">
+							<p:commandButton id="removeemployee"
+								actionListener="#{projectManagedBean.removeEmployeeFromProject(employee,project)}"
+								update="@(.mainform)" ajax="true" icon="ui-icon-cancel"
+								style="height: 30px;"
+								disabled="#{project.projectEndDate le now}">
+								<p:confirm header="Confirmation" message="Are you sure ?"
+									icon="ui-icon-alert" />
+							</p:commandButton>
+							<p:confirmDialog global="true" showEffect="fade"
+								hideEffect="fade">
+								<p:commandButton value="Yes" type="button"
+									styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+								<p:commandButton value="No" type="button"
+									styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+							</p:confirmDialog>
+						</sec:authorize>
+
+						<p:commandButton icon="ui-icon-search" update="@(.ec)"
+							oncomplete="PF('ew').show()" style="height: 30px;">
+							<f:setPropertyActionListener value="#{employee}"
+								target="#{projectManagedBean.selectedEmployee}" />
+						</p:commandButton>
+					</p:column>
+
+					<sec:authorize access="hasRole('ADMIN_ROLE')">
+						<f:facet name="footer">
+							<p:commandButton value="Add An Employee" icon="ui-icon-extlink"
+								actionListener="#{addEmployeeToProjectBacking.openNewDialogue(project)}"
+								disabled="#{project.projectEndDate le now}">
+								<p:ajax event="dialogReturn"
+									listener="#{addEmployeeToProjectBacking.addEmployeesToProject()}"
+									update="@(.mainform)" />
+							</p:commandButton>
+						</f:facet>
+					</sec:authorize>
+				</p:dataTable>
+			</p:rowExpansion>
+
+
+		</p:dataTable>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<p:dialog
+			header="#{projectManagedBean.selectedProject.projectName} Informations"
+			widgetVar="projectDialog" modal="true" showEffect="fade"
+			hideEffect="fade" resizable="false" styleClass="projectDialog"
+			draggable="false">
+			<p:outputPanel styleClass="projectDetail">
+				<h:panelGrid columns="2"
+					rendered="#{not empty projectManagedBean.selectedProject}">
+					<h:outputText value="ID: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectManagedBean.selectedProject.projectId}" />
+
+					<h:outputText value="Name: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectManagedBean.selectedProject.projectName}" />
+
+					<h:outputText value="Start date: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectManagedBean.selectedProject.projectStartDate}">
+						<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+					</h:outputText>
+
+
+					<h:outputText value="End date: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectManagedBean.selectedProject.projectEndDate}">
+						<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+					</h:outputText>
+
+					<h:outputText value="Project Type: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectManagedBean.selectedProject.projectType.projectTypeLabel}" />
+
+					<h:outputText value="Description: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectManagedBean.selectedProject.projectDescription}" />
+				</h:panelGrid>
+			</p:outputPanel>
+		</p:dialog>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<p:dialog
+			header="#{projectManagedBean.selectedEmployee.employeeName} #{projectManagedBean.selectedEmployee.employeeName} Informations"
+			widgetVar="ew" modal="true" showEffect="fade" hideEffect="fade"
+			resizable="false" styleClass="ec" draggable="false" width="550">
+			<p:outputPanel styleClass="ed">
+				<h:panelGrid columns="2"
+					rendered="#{not empty projectManagedBean.selectedEmployee}">
+					<h:outputText value="CIN: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectManagedBean.selectedEmployee.employeeCin}" />
+
+					<h:outputText value="Name: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectManagedBean.selectedEmployee.employeeName}" />
+
+					<h:outputText value="Last Name: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectManagedBean.selectedEmployee.employeeLastname}" />
+
+					<h:outputText value="BirthDate: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectManagedBean.selectedEmployee.employeeBirthdate}">
+						<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+					</h:outputText>
+
+					<h:outputText value="Job Position: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectManagedBean.selectedEmployee.jobPosition.jobPositonLabel}" />
+
+					<h:outputText value="Email: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectManagedBean.selectedEmployee.employeeEmail}" />
+				</h:panelGrid>
+			</p:outputPanel>
+		</p:dialog>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<p:blockUI block="
+						projecttable" trigger="projecttable">
+					Loading...
+		</p:blockUI>
+		<sec:authorize access="hasRole('ADMIN_ROLE')">
+			<p:blockUI block="projecttable" trigger="projecttable:remove">
+					Deleting...
+		</p:blockUI>
+
+		</sec:authorize>
+	</h:form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<sec:authorize access="hasRole('ADMIN_ROLE')">
+
+		<p:dialog
+			header="Edit #{projectManagedBean.selectedProject.projectName}"
+			widgetVar="pw" modal="true" showEffect="fade" hideEffect="fade"
+			resizable="false" styleClass="pc" draggable="false"
+			appendTo="@(body)" height="350" width="390">
+			<h:form styleClass="pf">
+				<p:outputPanel styleClass="po">
+					<p:messages autoUpdate="true" id="messages" closable="true" />
+					<h:panelGrid columns="2">
+
+
+
+						<p:outputLabel id="namelabel" for="projectname" value="Name: "
+							style="font-weight: bold;" />
+						<p:inputText id="projectname"
+							value="#{projectManagedBean.selectedProject.projectName}"
+							requiredMessage="The Name Should not be Empty."
+							validatorMessage="Please Enter A Valid Name (Only Letters).">
+
+							<f:validateLength maximum="50" minimum="1" />
+							<f:validateRequired />
+							<f:validateRegex pattern="^\w+( \w+)*$" />
+
+						</p:inputText>
+
+						<p:outputLabel id="startdatelabel" style="font-weight: bold;"
+							for="projectstartdate" value="Project Start Date: " />
+						<p:calendar id="projectstartdate"
+							value="#{projectManagedBean.selectedProject.projectStartDate}"
+							pattern="dd-MM-yyyy" mask="true" styleClass="sd"
+							validator="#{projectManagedBean.validateStarDate}" />
+
+						<p:outputLabel id="enddatelabel" for="projectenddate"
+							value="Project End Date: " style="font-weight: bold;" />
+						<p:calendar id="projectenddate"
+							value="#{projectManagedBean.selectedProject.projectEndDate}"
+							pattern="dd-MM-yyyy" mask="true" required="true"
+							requiredMessage="Please Enter A Date.">
+							<o:validateOrder components="projectstartdate projectenddate"
+								message="End Date Must Be After Start Date." id="vo"
+								showMessageFor="projectenddate" />
+						</p:calendar>
+
+						<p:outputLabel for="projecttype" value="Project Type:"
+							style="font-weight: bold;" />
+						<p:selectOneMenu id="projecttype"
+							value="#{projectManagedBean.projectTypeId}" style="width: 162px">
+							<f:selectItems value="#{projectManagedBean.projectTypes}"
+								var="projecttypevar" itemValue="#{projecttypevar.projectTypeId}"
+								itemLabel="#{projecttypevar.projectTypeLabel}" />
+						</p:selectOneMenu>
+
+						<p:outputLabel id="descriptionlabel" for="projectdesc"
+							value="Description: " style="font-weight: bold;" />
+						<p:inputTextarea id="projectdesc"
+							value="#{projectManagedBean.selectedProject.projectDescription}"
+							autoResize="false" rows="3" cols="23">
+						</p:inputTextarea>
+
+						<p:commandButton id="submit" value="Comfirm"
+							actionListener="#{projectManagedBean.updateProject}"
+							style="position:absolute; right: 65px;"
+							update=":#{p:component('messages')} @(.pf) @(.mainform)" />
+
+					</h:panelGrid>
+				</p:outputPanel>
+			</h:form>
+		</p:dialog>
+	</sec:authorize>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<h:panelGrid columns="2" cellpadding="10">
+		<p:link value="Back To Index"
+			outcome="#{navigationManagedBean.processIndex()}" />
+		<p:link value="#{flash['addAnotherProject']}"
+			outcome="#{navigationManagedBean.processAddProjectPage()}" />
+	</h:panelGrid>
+</h:body>
+</html>

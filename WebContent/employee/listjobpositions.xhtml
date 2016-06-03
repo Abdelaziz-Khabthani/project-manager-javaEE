@@ -1,0 +1,217 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pm="http://primefaces.org/mobile"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:sec="http://www.springframework.org/security/tags">
+<h:head>
+	<title>List Job Positions</title>
+</h:head>
+<h:body>
+	<h:form id="logout">
+		<h:panelGrid columns="2">
+			<p:outputLabel value="Hello #{loginBean.fullUserName}!" />
+			<p:commandLink value="Logout" action="#{loginBean.logOut()}" />
+		</h:panelGrid>
+		<p:separator />
+	</h:form>
+
+	<p:messages id="messages" autoUpdate="true" closable="true"
+		globalOnly="false" />
+
+
+	<sec:authorize access="hasRole('ADMIN_ROLE')">
+		<h:form>
+
+			<p:panel header="Add A Job Position" style="margin-bottom: 30px">
+				<h:panelGrid columns="3" border="0">
+					<h:outputText value="Add a Job Position Label: "
+						style="vertical-align: middle;" />
+					<p:inputText id="jobPositionLabel" placeholder="Job Position Label"
+						value="#{jobPositionManagedBean.jobPosition.jobPositonLabel}"
+						style="vertical-align: middle;"
+						validator="#{jobPositionManagedBean.validateJobPositionLabel}">
+					</p:inputText>
+					<p:commandButton icon="ui-icon-plus"
+						action="#{jobPositionManagedBean.addJobPosition}"
+						update="@(.form)"
+						style="height: 30px; vertical-align: middle; margin-left: 10px" />
+				</h:panelGrid>
+			</p:panel>
+		</h:form>
+	</sec:authorize>
+
+
+
+	<h:form styleClass="form">
+		<p:dataTable id="jobPositions"
+			value="#{jobPositionManagedBean.jobPositions}" var="jobPosition"
+			emptyMessage="No Job Positions Found." editable="true"
+			editMode="cell" widgetVar="jpCells"
+			rowKey="#{jobPosition.jobPositionId}"
+			filteredValue="#{jobPositionManagedBean.filtredJobPositions}">
+
+			<sec:authorize access="hasRole('ADMIN_ROLE')">
+				<p:ajax event="cellEdit"
+					listener="#{jobPositionManagedBean.updateJobPosition}">
+				</p:ajax>
+			</sec:authorize>
+
+			<f:facet name="header">
+				<p:outputPanel
+					style="text-align: right; margin-top: 1px; margin-bottom: 1px;">
+					<h:outputText value="Search By Name: " />
+					<p:inputText id="globalFilter" onkeyup="PF('jpCells').filter()"
+						style="width:150px" placeholder="Enter keyword" />
+				</p:outputPanel>
+			</f:facet>
+
+			<p:column width="20">
+				<p:rowToggler />
+			</p:column>
+
+
+			<p:column headerText="Id" width="20">
+				<h:outputText value="#{jobPosition.jobPositionId}" />
+			</p:column>
+
+
+			<p:column headerText="Name" filterBy="#{jobPosition.jobPositonLabel}"
+				filterStyle="display:none; visibility:hidden;">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{jobPosition.jobPositonLabel}" />
+					</f:facet>
+
+					<f:facet name="input">
+
+						<sec:authorize access="hasRole('ADMIN_ROLE')">
+							<p:inputText value="#{jobPosition.jobPositonLabel}"
+								validator="#{jobPositionManagedBean.validateJobPositionLabel}">
+							</p:inputText>
+						</sec:authorize>
+						<sec:authorize access="hasRole('VIEWER_ROLE')">
+							<h:outputText value="#{jobPosition.jobPositonLabel}" />
+						</sec:authorize>
+
+					</f:facet>
+
+				</p:cellEditor>
+			</p:column>
+
+			<sec:authorize access="hasRole('ADMIN_ROLE')">
+				<p:column width="42">
+					<p:commandButton id="remove"
+						actionListener="#{jobPositionManagedBean.deleteJobPosition(jobPosition)}"
+						update="@(.form)" type="link" ajax="true" icon="ui-icon-trash"
+						style="height: 30px;">
+						<p:confirm header="Confirmation"
+							message="Continue removing this Job Position?"
+							icon="ui-icon-alert" />
+					</p:commandButton>
+					<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+						<p:commandButton value="Yes" type="button"
+							styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+						<p:commandButton value="No" type="button"
+							styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+					</p:confirmDialog>
+				</p:column>
+			</sec:authorize>
+
+
+
+			<p:rowExpansion>
+				<p:dataTable id="employees" value="#{jobPosition.employees}"
+					var="employee" rows="5" paginatorPosition="bottom"
+					paginatorTemplate="{PreviousPageLink} {PageLinks} {NextPageLink}"
+					emptyMessage="No Employees With this Job Position."
+					style="margin-top: 10px; margin-bottom: 10px;" paginator="true"
+					widgetVar="widgetEmployee">
+					<f:facet name="header">
+						<p:outputPanel
+							style="text-align: right; margin-top: 1px; margin-bottom: 1px;">
+							<h:outputText value="Search all fields: " />
+							<p:inputText id="globalFilter"
+								onkeyup="PF('widgetEmployee').filter()" style="width:150px"
+								placeholder="Enter keyword" />
+						</p:outputPanel>
+					</f:facet>
+
+					<p:column headerText="Id" filterBy="#{employee.employeeCin}"
+						filterStyle="display:none; visibility:hidden;">
+						<h:outputText value="#{employee.employeeCin}" />
+					</p:column>
+
+					<p:column headerText="Name" filterBy="#{employee.employeeName}"
+						filterStyle="display:none; visibility:hidden;">
+						<h:outputText value="#{employee.employeeName}" />
+					</p:column>
+
+					<p:column headerText="Last Name"
+						filterBy="#{employee.employeeLastname}"
+						filterStyle="display:none; visibility:hidden;">
+						<h:outputText value="#{employee.employeeLastname}" />
+					</p:column>
+
+					<p:column headerText="Birth Date">
+						<h:outputText value="#{employee.employeeBirthdate}">
+							<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+						</h:outputText>
+					</p:column>
+
+					<p:column width="42" headerText="Info">
+						<p:commandButton icon="ui-icon-search" update="@(.employeeDialog)"
+							oncomplete="PF('employeeDialog').show()" style="height: 30px;">
+							<f:setPropertyActionListener value="#{employee}"
+								target="#{jobPositionManagedBean.selectedEmployee}" />
+						</p:commandButton>
+					</p:column>
+
+				</p:dataTable>
+			</p:rowExpansion>
+		</p:dataTable>
+
+		<p:dialog
+			header="#{jobPositionManagedBean.selectedEmployee.employeeName} #{jobPositionManagedBean.selectedEmployee.employeeLastname} Informations"
+			widgetVar="employeeDialog" modal="true" showEffect="fade"
+			hideEffect="fade" resizable="false" styleClass="employeeDialog"
+			draggable="false">
+			<p:outputPanel styleClass="employeeDetail">
+				<h:panelGrid columns="2">
+					<h:outputText value="CIN: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{jobPositionManagedBean.selectedEmployee.employeeCin}" />
+
+					<h:outputText value="Name: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{jobPositionManagedBean.selectedEmployee.employeeName}" />
+
+					<h:outputText value="Last Name: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{jobPositionManagedBean.selectedEmployee.employeeLastname}" />
+
+					<h:outputText value="Birthdate: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{jobPositionManagedBean.selectedEmployee.employeeBirthdate}">
+						<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+					</h:outputText>
+
+					<h:outputText value="Job Position: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{jobPositionManagedBean.selectedEmployee.jobPosition.jobPositonLabel}" />
+
+					<h:outputText value="E-mail: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{jobPositionManagedBean.selectedEmployee.employeeEmail}" />
+				</h:panelGrid>
+			</p:outputPanel>
+		</p:dialog>
+	</h:form>
+</h:body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pm="http://primefaces.org/mobile"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:sec="http://www.springframework.org/security/tags">
+<h:head>
+	<title>List Project Types</title>
+</h:head>
+<h:body>
+	<h:outputStylesheet name="css/style.css" />
+<!-- filtred values -->
+
+	<h:form id="logout">
+		<h:panelGrid columns="2">
+			<p:outputLabel value="Hello #{loginBean.fullUserName}!" />
+			<p:commandLink value="Logout" action="#{loginBean.logOut()}" />
+		</h:panelGrid>
+		<p:separator />
+	</h:form>
+
+
+	<p:messages id="messages" autoUpdate="true" closable="true"
+		globalOnly="false" />
+	<sec:authorize access="hasRole('ADMIN_ROLE')">
+		<h:form>
+
+			<p:panel header="Add A Project Type" style="margin-bottom: 30px">
+				<h:panelGrid columns="3" border="0">
+					<h:outputText value="Add a Project Type Label: "
+						style="vertical-align: middle;" />
+					<p:inputText id="projectTypeLabel" placeholder="Project Type Label"
+						value="#{projectTypeManagedBean.projectType.projectTypeLabel}"
+						style="vertical-align: middle;"
+						validator="#{projectTypeManagedBean.validateProjectTypeLabel}">
+					</p:inputText>
+					<p:commandButton icon="ui-icon-plus"
+						action="#{projectTypeManagedBean.addProjectType}"
+						update="@(.form)"
+						style="height: 30px; vertical-align: middle; margin-left: 10px" />
+				</h:panelGrid>
+			</p:panel>
+		</h:form>
+	</sec:authorize>
+
+
+	<h:form styleClass="form">
+		<p:dataTable id="projectTypes"
+			value="#{projectTypeManagedBean.projectTypes}" var="projectType"
+			emptyMessage="No Project Type Found." editable="true" editMode="cell"
+			widgetVar="ptCells" rowKey="#{projectType.projectTypeId}" filteredValue="#{projectTypeManagedBean.filrredProjectTypes}">
+
+			<sec:authorize access="hasRole('ADMIN_ROLE')">
+				<p:ajax event="cellEdit"
+					listener="#{projectTypeManagedBean.updateProjectType}">
+				</p:ajax>
+			</sec:authorize>
+
+			<f:facet name="header">
+				<p:outputPanel
+					style="text-align: right; margin-top: 1px; margin-bottom: 1px;">
+					<h:outputText value="Search By Name: " />
+					<p:inputText id="globalFilter" onkeyup="PF('ptCells').filter()"
+						style="width:150px" placeholder="Enter keyword" />
+				</p:outputPanel>
+			</f:facet>
+
+			<p:column width="20">
+				<p:rowToggler />
+			</p:column>
+
+
+			<p:column headerText="Id" width="20">
+				<h:outputText value="#{projectType.projectTypeId}" />
+			</p:column>
+
+
+			<p:column headerText="Name"
+				filterBy="#{projectType.projectTypeLabel}"
+				filterStyle="display:none; visibility:hidden;">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{projectType.projectTypeLabel}" />
+					</f:facet>
+
+					<f:facet name="input">
+						<sec:authorize access="hasRole('ADMIN_ROLE')">
+							<p:inputText value="#{projectType.projectTypeLabel}"
+								validator="#{projectTypeManagedBean.validateProjectTypeLabel}">
+							</p:inputText>
+						</sec:authorize>
+						<sec:authorize access="hasRole('VIEWER_ROLE')">
+							<h:outputText value="#{projectType.projectTypeLabel}" />
+						</sec:authorize>
+					</f:facet>
+
+				</p:cellEditor>
+			</p:column>
+			<sec:authorize access="hasRole('ADMIN_ROLE')">
+				<p:column width="42">
+					<p:commandButton id="remove"
+						actionListener="#{projectTypeManagedBean.deleteProjectTypes(projectType)}"
+						update="@(.form)" type="link" ajax="true" icon="ui-icon-trash"
+						style="height: 30px;">
+						<p:confirm header="Confirmation"
+							message="Continue removing this Project Type ?"
+							icon="ui-icon-alert" />
+					</p:commandButton>
+					<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+						<p:commandButton value="Yes" type="button"
+							styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+						<p:commandButton value="No" type="button"
+							styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+					</p:confirmDialog>
+				</p:column>
+
+			</sec:authorize>
+
+			<p:rowExpansion>
+				<p:dataTable id="projects" value="#{projectType.projects}"
+					var="project" rows="5" paginatorPosition="bottom"
+					paginatorTemplate="{PreviousPageLink} {PageLinks} {NextPageLink}"
+					emptyMessage="No projects With this Project Type."
+					style="margin-top: 10px; margin-bottom: 10px;" paginator="true"
+					widgetVar="widgetProject"
+					rowStyleClass="#{project.projectEndDate le now ? 'red' : 'green'}">
+					<f:facet name="header">
+						<p:outputPanel
+							style="text-align: right; margin-top: 1px; margin-bottom: 1px;">
+							<h:outputText value="Search all fields: " />
+							<p:inputText id="globalFilter"
+								onkeyup="PF('widgetProject').filter()" style="width:150px"
+								placeholder="Enter keyword" />
+						</p:outputPanel>
+					</f:facet>
+
+					<p:column headerText="Id" filterBy="#{project.projectId}"
+						filterStyle="display:none; visibility:hidden;">
+						<h:outputText value="#{project.projectId}" />
+					</p:column>
+
+					<p:column headerText="Name" filterBy="#{project.projectName}"
+						filterStyle="display:none; visibility:hidden;">
+						<h:outputText value="#{project.projectName}" />
+					</p:column>
+
+					<p:column headerText="Start Date">
+						<h:outputText value="#{project.projectStartDate}">
+							<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="End Date">
+						<h:outputText value="#{project.projectEndDate}">
+							<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+						</h:outputText>
+					</p:column>
+
+					<p:column width="42" headerText="Info">
+						<p:commandButton icon="ui-icon-search" update="@(.projectDialog)"
+							oncomplete="PF('projectDialog').show()" style="height: 30px;">
+							<f:setPropertyActionListener value="#{project}"
+								target="#{projectTypeManagedBean.selectedProject}" />
+						</p:commandButton>
+					</p:column>
+
+				</p:dataTable>
+			</p:rowExpansion>
+		</p:dataTable>
+
+		<p:dialog
+			header="#{projectTypeManagedBean.selectedProject.projectName} Informations"
+			widgetVar="projectDialog" modal="true" showEffect="fade"
+			hideEffect="fade" resizable="false" styleClass="projectDialog"
+			draggable="false">
+			<p:outputPanel styleClass="projectDetail">
+				<h:panelGrid columns="2">
+					<h:outputText value="ID: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectTypeManagedBean.selectedProject.projectId}" />
+
+					<h:outputText value="Name: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectTypeManagedBean.selectedProject.projectName}" />
+
+					<h:outputText value="Start Date: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectTypeManagedBean.selectedProject.projectStartDate}">
+						<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+					</h:outputText>
+
+					<h:outputText value="End Date: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectTypeManagedBean.selectedProject.projectEndDate}">
+						<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+					</h:outputText>
+
+					<h:outputText value="Project Type: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectTypeManagedBean.selectedProject.projectType.projectTypeLabel}">
+					</h:outputText>
+
+					<h:outputText value="Description: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{projectTypeManagedBean.selectedProject.projectDescription}" />
+				</h:panelGrid>
+			</p:outputPanel>
+		</p:dialog>
+	</h:form>
+</h:body>
+</html>

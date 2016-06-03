@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pm="http://primefaces.org/mobile"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="http://www.springframework.org/security/tags">
+<h:head>
+	<title>Index</title>
+</h:head>
+<h:body>
+
+	<h:form id="logout">
+		<h:panelGrid columns="2">
+			<p:outputLabel value="Hello #{loginBean.fullUserName}! " />
+			<p:commandLink value="Logout" action="#{loginBean.logOut()}" />
+		</h:panelGrid>
+		<p:separator style="margin-bottom: 20px;" />
+	</h:form>
+
+	<h:form>
+		<h:panelGrid columns="2" cellpadding="10">
+
+
+			<sec:authorize access="hasRole('ADMIN_ROLE')">
+				<p:link value="Add An Employee"
+					outcome="#{navigationManagedBean.processAddEmployeePage()}" />
+			</sec:authorize>
+
+
+
+			<sec:authorize access="hasRole('ADMIN_ROLE')">
+				<p:link value="Add A Project"
+					outcome="#{navigationManagedBean.processAddProjectPage()}" />
+			</sec:authorize>
+
+
+
+			<p:link value="Job Position Manager"
+				outcome="#{navigationManagedBean.processJobPositionPage()}" />
+			<p:link value="Project Types Manager"
+				outcome="#{navigationManagedBean.processProjectTypePage()}" />
+			<p:link value="List All Employees"
+				outcome="#{navigationManagedBean.processListEmployeePage()}" />
+			<p:link value="List All Projects"
+				outcome="#{navigationManagedBean.processListProjectPage()}" />
+		</h:panelGrid>
+	</h:form>
+</h:body>
+</html>

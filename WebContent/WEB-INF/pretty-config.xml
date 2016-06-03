@@ -1,0 +1,38 @@
+<pretty-config xmlns="http://ocpsoft.org/schema/rewrite-config-prettyfaces"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://ocpsoft.org/schema/rewrite-config-prettyfaces
+                      http://ocpsoft.org/xml/ns/prettyfaces/rewrite-config-prettyfaces.xsd">
+
+	<url-mapping id="addemployee">
+		<pattern value="/employee/add/" />
+		<view-id value="/employee/addemployee.xhtml" />
+	</url-mapping>
+	<url-mapping id="addproject">
+		<pattern value="/project/add" />
+		<view-id value="/project/addproject.xhtml" />
+	</url-mapping>
+	<url-mapping id="listemployee">
+		<pattern value="/employee/list" />
+		<view-id value="/employee/listemployee.xhtml" />
+	</url-mapping>
+	<url-mapping id="listproject">
+		<pattern value="/project/list" />
+		<view-id value="/project/listproject.xhtml" />
+	</url-mapping>
+	<url-mapping id="index">
+		<pattern value="/index" />
+		<view-id value="/index.xhtml" />
+	</url-mapping>
+	<url-mapping id="login">
+		<pattern value="/login" />
+		<view-id value="/login.xhtml" />
+	</url-mapping>
+	<url-mapping id="jobPosition">
+		<pattern value="/jobposition/manager" />
+		<view-id value="/employee/listjobpositions.xhtml" />
+	</url-mapping>
+	<url-mapping id="projectType">
+		<pattern value="/projecttype/manager" />
+		<view-id value="/project/listprojecttypes.xhtml" />
+	</url-mapping>
+</pretty-config>

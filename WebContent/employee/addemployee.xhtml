@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pm="http://primefaces.org/mobile"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<title>Add Employee</title>
+</h:head>
+<h:body>
+
+
+	<h:form id="logout">
+		<h:panelGrid columns="2">
+			<p:outputLabel value="Hello #{loginBean.fullUserName}!" />
+			<p:commandLink value="Logout" action="#{loginBean.logOut()}" />
+		</h:panelGrid>
+		<p:separator />
+	</h:form>
+
+
+
+
+	<h:form enctype="multipart/form-data">
+		<p:wizard id="wizard"
+			flowListener="#{employeeManagedBean.handleWizardFlow}">
+			<p:tab id="personal" title="Personal Informations">
+				<p:panel header="Personal Informations">
+					<h:panelGrid columns="3">
+						<p:outputLabel id="idlabel" for="employeeid" value="CIN: " />
+						<p:inputText id="employeeid"
+							value="#{employeeManagedBean.idEmployee}"
+							validator="#{employeeManagedBean.validatePrimaryKey}">
+
+							<f:ajax execute="employeeid"
+								render="idmessage employeeid idlabel" event="valueChange" />
+
+						</p:inputText>
+
+						<p:message id="idmessage" for="employeeid" />
+
+						<p:outputLabel id="namelabel" for="employeename" value="Name: " />
+						<p:inputText id="employeename"
+							value="#{employeeManagedBean.nameEmployee}"
+							requiredMessage="The Name Should not be Empty."
+							validatorMessage="Please Enter A Valid Name (Only Letters).">
+
+							<f:validateLength maximum="50" minimum="1" />
+							<f:validateRequired />
+							<f:validateRegex pattern="^[A-Za-z]+$" />
+
+						</p:inputText>
+
+						<p:message id="namemessage" for="employeename" />
+
+						<p:outputLabel id="lastnamelabel" for="employeelastname"
+							value="Last Name: " />
+						<p:inputText id="employeelastname"
+							value="#{employeeManagedBean.lastNameEmployee}"
+							requiredMessage="The Last Name Should not be Empty."
+							validatorMessage="Please Enter A Valid Last Name (Only Letters).">
+
+							<f:validateLength maximum="50" minimum="1" />
+							<f:validateRequired />
+							<f:validateRegex pattern="^[A-Za-z]+$" />
+
+						</p:inputText>
+
+						<p:message id="lastnamemessage" for="employeelastname" />
+
+						<p:outputLabel id="birthdaylabel" for="employeebirthday"
+							value="Birthday: " />
+						<p:calendar id="employeebirthday"
+							value="#{employeeManagedBean.birthdayEmployee}"
+							pattern="dd-MM-yyyy" mask="true"
+							requiredMessage="Please Enter a date.">
+
+							<f:validateRequired />
+
+						</p:calendar>
+
+						<p:message id="birthdaymessage" for="employeebirthday" />
+
+						<p:outputLabel id="emaillabel" for="employeeemail"
+							value="E-mail: " />
+						<p:inputText id="employeeemail"
+							value="#{employeeManagedBean.emailEmployee}"
+							requiredMessage="The Email Should not be Empty."
+							validatorMessage="Please Enter A Valid Email.">
+
+							<f:validateRequired />
+							<f:validateRegex
+								pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+
+						</p:inputText>
+
+						<p:message id="emailmessage" for="employeeemail" />
+
+						<p:outputLabel for="jobposition" value="Job Position:" />
+						<p:selectOneMenu id="jobposition"
+							value="#{employeeManagedBean.jobPositionEmployeeId}"
+							style="width: 202px;" styleClass="jpu">
+							<f:selectItems value="#{jobPositionManagedBean.jobPositions}"
+								var="jobpositionvar" itemValue="#{jobpositionvar.jobPositionId}"
+								itemLabel="#{jobpositionvar.jobPositonLabel}" />
+						</p:selectOneMenu>
+
+						<p:commandLink oncomplete="PF('jpw').show()"
+							value="Add Job Position..." update="@(.jpc)"
+							style="color:blue; margin-left:5px" />
+
+						<p:outputLabel for="skip" value="Skip Project Assignement" />
+						<p:selectBooleanCheckbox id="skip"
+							value="#{employeeManagedBean.skip}" />
+						<p:message for="skip" />
+						
+						<p:outputLabel for="photo" value="Profile Picture: " />
+						<p:fileUpload id="photo"
+							value="#{employeeManagedBean.employeePhoto}" mode="simple"
+							allowTypes=" /(\.|\/)(gif|jpe?g|png)$/"
+							invalidFileMessage="Invalid Picture." sizeLimit="250000"
+							invalidSizeMessage="File is too big." label="Upload"
+							requiredMessage="Please upload a profile picture." skinSimple="true" />
+						<p:message id="photomessage" for="photo" />
+					</h:panelGrid>
+				</p:panel>
+			</p:tab>
+			<p:tab id="projects" title="Projects">
+				<p:panel header="Assigne Projects">
+					<p:dataTable value="#{projectManagedBean.listAllPendingProjects}"
+						var="project" rows="5" paginatorPosition="bottom"
+						paginatorTemplate="{PreviousPageLink} {PageLinks} {NextPageLink}"
+						emptyMessage="No Projects Found." selectionMode="multiple"
+						selection="#{employeeManagedBean.listProject}"
+						rowKey="#{project.projectId}" widgetVar="widgetAssigne"
+						filteredValue="#{employeeManagedBean.filtredProjects}">
+						<f:facet name="header">
+							<p:outputPanel
+								style="text-align: right; margin-top: 1px; margin-bottom: 1px;">
+								<h:outputText value="Search all fields:" />
+								<p:inputText id="globalFilter"
+									onkeyup="PF('widgetAssigne').filter()" style="width:150px"
+									placeholder="Enter keyword" />
+							</p:outputPanel>
+						</f:facet>
+						<p:column headerText="Id" filterBy="#{project.projectId}"
+							filterStyle="display:none; visibility:hidden;">
+							<h:outputText value="#{project.projectId}" />
+						</p:column>
+						<p:column headerText="Name" filterBy="#{project.projectName}"
+							filterStyle="display:none; visibility:hidden;">
+							<h:outputText value="#{project.projectName}" />
+						</p:column>
+						<p:column headerText="Type"
+							filterBy="#{project.projectType.projectTypeLabel}"
+							filterStyle="display:none; visibility:hidden;">
+							<h:outputText value="#{project.projectType.projectTypeLabel}" />
+						</p:column>
+						<p:column headerText="Start Date">
+							<h:outputText value="#{project.projectStartDate}">
+								<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="End Date">
+							<h:outputText value="#{project.projectEndDate}">
+								<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+							</h:outputText>
+						</p:column>
+					</p:dataTable>
+				</p:panel>
+			</p:tab>
+			<p:tab id="confirmation" title="Confirmation">
+				<p:panel header="Confirmations" style="position: relative;">
+					<h:panelGrid columns="2">
+						<h:outputText value="Id: " style="font-weight: bold;" />
+						<h:outputText value="#{employeeManagedBean.idEmployee}" />
+						<h:outputText value="Name: " style="font-weight: bold;" />
+						<h:outputText value="#{employeeManagedBean.nameEmployee}" />
+						<h:outputText value="Last Name: " style="font-weight: bold;" />
+						<h:outputText value="#{employeeManagedBean.lastNameEmployee}" />
+						<h:outputText value="Birthdate: " style="font-weight: bold;" />
+						<h:outputText value="#{employeeManagedBean.birthdayEmployee}">
+							<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+						</h:outputText>
+						<h:outputText value="Email: " style="font-weight: bold;" />
+						<h:outputText value="#{employeeManagedBean.emailEmployee}" />
+						<h:outputText value="Job Position: " style="font-weight: bold;" />
+						<h:outputText value="#{employeeManagedBean.jobPositionLabel()}" />
+					</h:panelGrid>
+					<p:dataTable value="#{employeeManagedBean.listProject}"
+						var="project" rows="5" paginatorPosition="bottom"
+						paginatorTemplate="{PreviousPageLink} {PageLinks} {NextPageLink}"
+						emptyMessage="No Projects Assigned." style="margin-top: 10px;">
+						<f:facet name="header">
+        					Assigned Projects
+    					</f:facet>
+						<p:column headerText="Id">
+							<h:outputText value="#{project.projectId}" />
+						</p:column>
+						<p:column headerText="Name">
+							<h:outputText value="#{project.projectName}" />
+						</p:column>
+						<p:column headerText="Type">
+							<h:outputText value="#{project.projectType.projectTypeLabel}" />
+						</p:column>
+						<p:column headerText="Start Date">
+							<h:outputText value="#{project.projectStartDate}">
+								<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="End Date">
+							<h:outputText value="#{project.projectEndDate}">
+								<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+							</h:outputText>
+						</p:column>
+						<p:column width="42">
+							<p:commandButton icon="ui-icon-search" update="@(.pc)"
+								oncomplete="PF('pw').show()" style="height: 30px;">
+								<f:setPropertyActionListener value="#{project}"
+									target="#{employeeManagedBean.selectedProject}" />
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+
+					<p:commandButton id="submit"
+						action="#{employeeManagedBean.addEmployee()}" value="Confirm"
+						style="position:absolute; right: -3px; margin-top: 16px; " />
+				</p:panel>
+			</p:tab>
+		</p:wizard>
+		<p:blockUI block="wizard" trigger="submit">
+			Persisting...
+		</p:blockUI>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<p:dialog
+			header="#{employeeManagedBean.selectedProject.projectName} Informations"
+			widgetVar="pw" modal="true" showEffect="fade" hideEffect="fade"
+			resizable="false" styleClass="pc" draggable="false" width="550">
+			<p:outputPanel styleClass="pd">
+				<h:panelGrid columns="2"
+					rendered="#{not empty employeeManagedBean.selectedProject}">
+					<h:outputText value="ID: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedProject.projectId}" />
+
+					<h:outputText value="Name: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedProject.projectName}" />
+
+					<h:outputText value="Project Type: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedProject.projectType.projectTypeLabel}" />
+
+					<h:outputText value="Satrt Date: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedProject.projectStartDate}">
+						<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+					</h:outputText>
+
+					<h:outputText value="End Date: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedProject.projectEndDate}">
+						<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+					</h:outputText>
+
+					<h:outputText value="Discription: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedProject.projectDescription}" />
+				</h:panelGrid>
+			</p:outputPanel>
+		</p:dialog>
+	</h:form>
+
+
+
+
+
+
+
+
+	<p:dialog header="Add Job Position" widgetVar="jpw" modal="true"
+		showEffect="fade" hideEffect="fade" resizable="false" styleClass="jpc"
+		draggable="false">
+		<h:form>
+			<p:outputPanel styleClass="jpo">
+				<p:message id="jobPositionLabelMessage" for="jobPositionLabel" />
+				<h:panelGrid columns="3">
+					<h:outputText value="Add a Job Position Label: "
+						style="vertical-align: middle;" />
+					<p:inputText id="jobPositionLabel" placeholder="Job Position Label"
+						value="#{jobPositionManagedBean.jobPosition.jobPositonLabel}"
+						style="vertical-align: middle;"
+						validator="#{jobPositionManagedBean.validateJobPositionLabel}" />
+					<p:commandButton icon="ui-icon-plus"
+						action="#{jobPositionManagedBean.addJobPosition}"
+						update=":#{p:component('jobPositionLabelMessage')} @(.jpu)"
+						style="height: 30px; vertical-align: middle; margin-left: 10px" />
+				</h:panelGrid>
+			</p:outputPanel>
+		</h:form>
+	</p:dialog>
+
+
+
+
+
+
+
+
+
+</h:body>
+</html>

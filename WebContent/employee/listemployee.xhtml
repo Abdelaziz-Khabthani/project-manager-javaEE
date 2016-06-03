@@ -1,0 +1,577 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pm="http://primefaces.org/mobile"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:sec="http://www.springframework.org/security/tags">
+<h:head>
+	<title>List Employees</title>
+</h:head>
+<h:body onload="#{employeeManagedBean.employeeAddedMessage()}">
+	<h:outputStylesheet name="css/style.css" />
+
+
+
+	<h:form id="logout">
+		<h:panelGrid columns="2">
+			<p:outputLabel value="Hello #{loginBean.fullUserName}!" />
+			<p:commandLink value="Logout" action="#{loginBean.logOut()}" />
+		</h:panelGrid>
+		<p:separator />
+	</h:form>
+
+	<p:messages id="messages" autoUpdate="true" closable="true"
+		globalOnly="true" />
+	<h:form>
+		<p:panel header="Search: " style="margin-bottom: 10px;" id="panel">
+			<h:panelGrid columns="4" border="0" id="p">
+				<p:outputLabel value="Search An Employee: " />
+				<p:calendar id="searchDate"
+					value="#{employeeManagedBean.keyWordDate}" pattern="dd-MM-yyyy"
+					mask="true"
+					rendered="#{employeeManagedBean.criteria == 'birthdate'}"
+					placeholder="DD-MM-YYYY">
+					<p:ajax event="dateSelect"
+						listener="#{employeeManagedBean.filterEmployees()}"
+						update="@(.mainform)" />
+					<p:ajax event="valueChange"
+						listener="#{employeeManagedBean.filterEmployees()}"
+						update="@(.mainform)" />
+				</p:calendar>
+				<p:inputText id="search" value="#{employeeManagedBean.keyWord}"
+					placeholder="Employee's #{employeeManagedBean.criteria}"
+					rendered="#{(employeeManagedBean.criteria == 'id') or (employeeManagedBean.criteria == 'name')}">
+					<p:ajax event="keyup"
+						listener="#{employeeManagedBean.filterEmployees()}"
+						update="@(.mainform)" />
+				</p:inputText>
+
+
+
+				<p:selectOneMenu id="searchJp"
+					value="#{employeeManagedBean.keyWord}"
+					rendered="#{employeeManagedBean.criteria == 'job position'}">
+					<p:ajax listener="#{employeeManagedBean.filterEmployees()}"
+						update="@(.mainform)" />
+					<f:selectItem itemLabel="Select Job Position" itemValue="" />
+					<f:selectItems value="#{employeeManagedBean.jobPositions}" var="jp"
+						itemLabel="#{jp.jobPositonLabel}"
+						itemValue="#{jp.jobPositonLabel}" />
+				</p:selectOneMenu>
+
+
+
+				<p:selectOneMenu id="criteria"
+					value="#{employeeManagedBean.criteria}">
+					<p:ajax listener="#{employeeManagedBean.onCriteriaChange()}"
+						update="panel @(.mainform)" />
+					<f:selectItems value="#{employeeManagedBean.criterias}" />
+				</p:selectOneMenu>
+			</h:panelGrid>
+		</p:panel>
+	</h:form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<h:form styleClass="mainform">
+		<p:dataTable id="employeetable" var="employee"
+			value="#{employeeManagedBean.listEmployees}" paginator="true"
+			paginatorPosition="bottom" rows="5"
+			paginatorTemplate="{PreviousPageLink} {PageLinks} {NextPageLink}"
+			emptyMessage="No Employees Found.">
+
+
+			<p:column headerText="Projects" style="width:80px">
+				<p:rowToggler />
+			</p:column>
+
+
+			<p:column headerText="Id">
+				<h:outputText value="#{employee.employeeCin}" />
+			</p:column>
+
+
+			<p:column headerText="Name">
+				<h:outputText value="#{employee.employeeName}" />
+			</p:column>
+
+
+			<p:column headerText="Last Name">
+				<h:outputText value="#{employee.employeeLastname}" />
+			</p:column>
+
+
+			<p:column headerText="Birthday">
+				<h:outputText value="#{employee.employeeBirthdate}">
+					<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+				</h:outputText>
+			</p:column>
+
+
+			<p:column width="132" headerText="Actions">
+
+				<sec:authorize access="hasRole('ADMIN_ROLE')">
+					<p:commandButton id="remove"
+						actionListener="#{employeeManagedBean.removeEmployee(employee)}"
+						update="@(.mainform)" type="link" ajax="true" icon="ui-icon-trash"
+						style="height: 30px;">
+						<p:confirm header="Confirmation"
+							message="Continue removing this employee?" icon="ui-icon-alert" />
+					</p:commandButton>
+					<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+						<p:commandButton value="Yes" type="button"
+							styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+						<p:commandButton value="No" type="button"
+							styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+					</p:confirmDialog>
+
+				</sec:authorize>
+
+
+				<p:commandButton icon="ui-icon-search" update="@(.employeeDialog)"
+					oncomplete="PF('employeeDialog').show()" style="height: 30px;">
+					<f:setPropertyActionListener value="#{employee}"
+						target="#{employeeManagedBean.selectedEmployee}" />
+				</p:commandButton>
+
+
+				<sec:authorize access="hasRole('ADMIN_ROLE')">
+					<p:commandButton icon="ui-icon-pencil" update="@(.ec)"
+						oncomplete="PF('ew').show()" style="height: 30px;">
+						<f:setPropertyActionListener value="#{employee}"
+							target="#{employeeManagedBean.selectedEmployee}" />
+						<f:setPropertyActionListener
+							value="#{employee.jobPosition.jobPositionId}"
+							target="#{employeeManagedBean.jobPositionEmployeeId}" />
+					</p:commandButton>
+				</sec:authorize>
+			</p:column>
+
+
+
+
+
+
+
+
+
+
+
+
+			<p:rowExpansion>
+				<p:outputPanel
+					style="text-align: center; margin-top: 5px; font-weight:bold;">
+					<h:outputText value="Assigned Projects" />
+				</p:outputPanel>
+				<p:dataTable id="projectdatatable" value="#{employee.projects}"
+					var="project" rows="5" paginatorPosition="bottom"
+					paginatorTemplate="{PreviousPageLink} {PageLinks} {NextPageLink}"
+					emptyMessage="No Projects Assigned."
+					style="margin-top: 10px; margin-bottom: 10px;"
+					rowStyleClass="#{project.projectEndDate le now ? 'red' : 'green'}"
+					widgetVar="widgetAssigned" paginator="true"
+					filteredValue="#{employeeManagedBean.filtredProjects}">
+					<f:facet name="header">
+						<p:outputPanel
+							style="text-align: right; margin-top: 1px; margin-bottom: 1px;">
+							<h:outputText value="Search all fields:" />
+							<p:inputText id="globalFilter"
+								onkeyup="PF('widgetAssigned').filter()" style="width:150px"
+								placeholder="Enter keyword" />
+						</p:outputPanel>
+
+
+					</f:facet>
+					<p:column headerText="Id" filterBy="#{project.projectId}"
+						filterStyle="display:none; visibility:hidden;">
+						<h:outputText value="#{project.projectId}" />
+					</p:column>
+					<p:column headerText="Name" filterBy="#{project.projectName}"
+						filterStyle="display:none; visibility:hidden;">
+						<h:outputText value="#{project.projectName}" />
+					</p:column>
+					<p:column headerText="Project Type"
+						filterBy="#{project.projectType.projectTypeLabel}"
+						filterStyle="display:none; visibility:hidden;">
+						<h:outputText value="#{project.projectType.projectTypeLabel}" />
+					</p:column>
+					<p:column headerText="Start Date">
+						<h:outputText value="#{project.projectStartDate}">
+							<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="End Date">
+						<h:outputText value="#{project.projectEndDate}">
+							<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+						</h:outputText>
+					</p:column>
+					<p:column width="88" headerText="Actions">
+						<sec:authorize access="hasRole('ADMIN_ROLE')">
+							<p:commandButton id="removeproject"
+								actionListener="#{employeeManagedBean.removeProjectFromEmployee(employee,project)}"
+								update="@(.mainform)" ajax="true" icon="ui-icon-cancel"
+								disabled="#{project.projectEndDate le now}"
+								style="height: 30px;">
+								<p:confirm header="Confirmation" message="Are you sure ?"
+									icon="ui-icon-alert" />
+							</p:commandButton>
+							<p:confirmDialog global="true" showEffect="fade"
+								hideEffect="fade">
+								<p:commandButton value="Yes" type="button"
+									styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+								<p:commandButton value="No" type="button"
+									styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+							</p:confirmDialog>
+						</sec:authorize>
+						<p:commandButton icon="ui-icon-search" update="@(.pc)"
+							oncomplete="PF('pw').show()" style="height: 30px;">
+							<f:setPropertyActionListener value="#{project}"
+								target="#{employeeManagedBean.selectedProject}" />
+						</p:commandButton>
+					</p:column>
+
+					<sec:authorize access="hasRole('ADMIN_ROLE')">
+						<f:facet name="footer">
+							<p:commandButton value="Add A Project" icon="ui-icon-extlink"
+								actionListener="#{addProjectToEmployeeBacking.openNewDialogue(employee)}">
+								<p:ajax event="dialogReturn"
+									listener="#{addProjectToEmployeeBacking.addProjectsToEmployee()}"
+									update="@(.mainform)" />
+							</p:commandButton>
+						</f:facet>
+					</sec:authorize>
+				</p:dataTable>
+			</p:rowExpansion>
+
+
+		</p:dataTable>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<p:dialog
+			header="#{employeeManagedBean.selectedEmployee.employeeName} #{employeeManagedBean.selectedEmployee.employeeLastname} Informations"
+			widgetVar="employeeDialog" modal="true" showEffect="fade"
+			hideEffect="fade" resizable="false" styleClass="employeeDialog"
+			draggable="false">
+			<p:outputPanel styleClass="employeeDetail">
+				<h:panelGrid columns="2"
+					rendered="#{not empty employeeManagedBean.selectedEmployee}">
+					<h:outputText value="CIN: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedEmployee.employeeCin}" />
+
+					<h:outputText value="Name: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedEmployee.employeeName}" />
+
+					<h:outputText value="Last Name: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedEmployee.employeeLastname}" />
+
+					<h:outputText value="Birthdate: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedEmployee.employeeBirthdate}">
+						<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+					</h:outputText>
+
+					<h:outputText value="Job Position: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedEmployee.jobPosition.jobPositonLabel}" />
+
+					<h:outputText value="E-mail: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedEmployee.employeeEmail}" />
+				</h:panelGrid>
+			</p:outputPanel>
+		</p:dialog>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<p:dialog
+			header="#{employeeManagedBean.selectedProject.projectName} Informations"
+			widgetVar="pw" modal="true" showEffect="fade" hideEffect="fade"
+			resizable="false" styleClass="pc" draggable="false" width="550">
+			<p:outputPanel styleClass="pd">
+				<h:panelGrid columns="2"
+					rendered="#{not empty employeeManagedBean.selectedProject}">
+					<h:outputText value="ID: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedProject.projectId}" />
+
+					<h:outputText value="Name: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedProject.projectName}" />
+
+					<h:outputText value="Project Type: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedProject.projectType.projectTypeLabel}" />
+
+					<h:outputText value="Satrt Date: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedProject.projectStartDate}">
+						<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+					</h:outputText>
+
+					<h:outputText value="End Date: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedProject.projectEndDate}">
+						<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+					</h:outputText>
+
+					<h:outputText value="Discription: " style="font-weight: bold;" />
+					<h:outputText
+						value="#{employeeManagedBean.selectedProject.projectDescription}" />
+				</h:panelGrid>
+			</p:outputPanel>
+		</p:dialog>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<p:blockUI block="
+						employeetable" trigger="employeetable">
+					Loading...
+		</p:blockUI>
+		
+		<sec:authorize access="hasRole('ADMIN_ROLE')">
+		<p:blockUI block="employeetable" trigger="employeetable:remove">
+					Deleting...
+		</p:blockUI>
+		</sec:authorize>
+	</h:form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<sec:authorize access="hasRole('ADMIN_ROLE')">
+		<p:dialog
+			header="Edit #{employeeManagedBean.selectedEmployee.employeeName} #{employeeManagedBean.selectedEmployee.employeeLastname}"
+			widgetVar="ew" modal="true" showEffect="fade" hideEffect="fade"
+			resizable="false" styleClass="ec" draggable="false"
+			appendTo="@(body)" height="350" width="390">
+			<h:form styleClass="ef">
+				<p:outputPanel styleClass="eo">
+					<p:messages autoUpdate="true" id="messages" closable="true" />
+					<h:panelGrid columns="2">
+
+
+
+						<p:outputLabel id="namelabel" for="employeename" value="Name: "
+							style="font-weight: bold;" />
+						<p:inputText id="employeename"
+							value="#{employeeManagedBean.selectedEmployee.employeeName}"
+							requiredMessage="The Name Should not be Empty."
+							validatorMessage="Please Enter A Valid Name (Only Letters).">
+							<f:validateLength maximum="50" minimum="1" />
+							<f:validateRequired />
+							<f:validateRegex pattern="^[A-Za-z]+$" />
+						</p:inputText>
+
+
+
+						<p:outputLabel id="lastnamelabel" for="employeelastname"
+							value="Last Name: " style="font-weight: bold;" />
+						<p:inputText id="employeelastname"
+							value="#{employeeManagedBean.selectedEmployee.employeeLastname}"
+							requiredMessage="The Last Name Should not be Empty."
+							validatorMessage="Please Enter A Valid Last Name (Only Letters).">
+							<f:validateLength maximum="50" minimum="1" />
+							<f:validateRequired />
+							<f:validateRegex pattern="^[A-Za-z]+$" />
+						</p:inputText>
+
+
+
+						<p:outputLabel id="birthdaylabel" for="employeebirthday"
+							value="Birthday: " style="font-weight: bold;" />
+						<p:calendar id="employeebirthday"
+							value="#{employeeManagedBean.selectedEmployee.employeeBirthdate}"
+							pattern="dd-MM-yyyy" mask="true"
+							requiredMessage="Please Enter a date.">
+							<f:validateRequired />
+						</p:calendar>
+
+
+
+						<p:outputLabel id="emaillabel" for="employeeemail"
+							value="E-mail: " style="font-weight: bold;" />
+						<p:inputText id="employeeemail"
+							value="#{employeeManagedBean.selectedEmployee.employeeEmail}"
+							requiredMessage="The Email Should not be Empty."
+							validatorMessage="Please Enter A Valid Email.">
+							<f:validateRequired />
+							<f:validateRegex
+								pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+						</p:inputText>
+
+
+
+						<p:outputLabel for="jobposition" value="Job Position:"
+							style="font-weight: bold;" />
+						<p:selectOneMenu id="jobposition"
+							value="#{employeeManagedBean.jobPositionEmployeeId}"
+							style="width: 162px">
+							<f:selectItems value="#{employeeManagedBean.jobPositions}"
+								var="jobpositionvar" itemValue="#{jobpositionvar.jobPositionId}"
+								itemLabel="#{jobpositionvar.jobPositonLabel}" />
+						</p:selectOneMenu>
+
+						<p:commandButton id="submit" value="Comfirm"
+							actionListener="#{employeeManagedBean.updateEmployee()}"
+							style="position:absolute; right: 110px;"
+							update=":#{p:component('messages')} @(.ef) @(.mainform)" />
+
+					</h:panelGrid>
+				</p:outputPanel>
+			</h:form>
+		</p:dialog>
+
+
+	</sec:authorize>
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<h:panelGrid columns="2" cellpadding="10">
+		<p:link value="Back To Index"
+			outcome="#{navigationManagedBean.processIndex()}" />
+		<p:link value="#{flash['addAnotherEmployee']}"
+			outcome="#{navigationManagedBean.processAddEmployeePage()}" />
+	</h:panelGrid>
+</h:body>
+</html>

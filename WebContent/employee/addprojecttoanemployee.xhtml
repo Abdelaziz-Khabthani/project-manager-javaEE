@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pm="http://primefaces.org/mobile"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="http://www.springframework.org/security/tags">
+<h:head>
+	<title>Add Project To An Employee</title>
+</h:head>
+<h:body>
+	<sec:authorize access="hasRole('ADMIN_ROLE')">
+		<h:form>
+			<p:dataTable value="#{addProjectToEmployeeBacking.remainingProjects}"
+				var="project" rows="5" paginatorPosition="bottom"
+				paginatorTemplate="{PreviousPageLink} {PageLinks} {NextPageLink}"
+				emptyMessage="No Projects Found." selectionMode="multiple"
+				selection="#{addProjectToEmployeeBacking.listProjects}"
+				rowKey="#{project.projectId}" id="a">
+
+
+				<p:ajax event="rowSelect"
+					listener="#{addProjectToEmployeeBacking.controlButton()}"
+					update="@form" />
+				<p:ajax event="rowUnselect"
+					listener="#{addProjectToEmployeeBacking.controlButton()}"
+					update="@form" />
+
+
+				<f:facet name="header">
+    	    	Assigne Projects
+	    	</f:facet>
+				<p:column headerText="Id">
+					<h:outputText value="#{project.projectId}" />
+				</p:column>
+				<p:column headerText="Name">
+					<h:outputText value="#{project.projectName}" />
+				</p:column>
+				<p:column headerText="Start Date">
+					<h:outputText value="#{project.projectStartDate}">
+						<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="End Date">
+					<h:outputText value="#{project.projectEndDate}">
+						<f:convertDateTime pattern="MMMM d, yyyy" timeZone="CET" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Project Type">
+					<h:outputText value="#{project.projectType.projectTypeLabel}" />
+				</p:column>
+			</p:dataTable>
+			<p:commandButton styleClass="button" value="Add Selected Project(s)"
+				action="#{addProjectToEmployeeBacking.closeDialoge()}"
+				disabled="#{addProjectToEmployeeBacking.buttonState}"
+				style="float: right; margin-top: 20px;" />
+		</h:form>
+	</sec:authorize>
+</h:body>
+</html>

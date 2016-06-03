@@ -1,0 +1,233 @@
+<?xml version="1.0"?>
+<faces-config version="2.2" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd">
+
+	<managed-bean>
+		<managed-bean-name>employeeManagedBean</managed-bean-name>
+		<managed-bean-class>com.abdelaziz.backing.EmployeeManagedBean</managed-bean-class>
+		<managed-bean-scope>view</managed-bean-scope>
+		<managed-property>
+			<property-name>employeeService</property-name>
+			<value>#{employeeService}</value>
+		</managed-property>
+		<managed-property>
+			<property-name>jobPositionService</property-name>
+			<value>#{jobPositionSerice}</value>
+		</managed-property>
+	</managed-bean>
+
+
+
+	<managed-bean>
+		<managed-bean-name>jobPositionManagedBean</managed-bean-name>
+		<managed-bean-class>com.abdelaziz.backing.JobPositionManagedBean</managed-bean-class>
+		<managed-bean-scope>view</managed-bean-scope>
+		<managed-property>
+			<property-name>jobPositionService</property-name>
+			<value>#{jobPositionSerice}</value>
+		</managed-property>
+	</managed-bean>
+
+	<managed-bean>
+		<managed-bean-name>loginValidator</managed-bean-name>
+		<managed-bean-class>com.abdelaziz.validator.LoginValidator</managed-bean-class>
+		<managed-bean-scope>application</managed-bean-scope>
+	</managed-bean>
+
+
+	<managed-bean>
+		<managed-bean-name>projectTypeManagedBean</managed-bean-name>
+		<managed-bean-class>com.abdelaziz.backing.ProjectTypeManagedBean</managed-bean-class>
+		<managed-bean-scope>view</managed-bean-scope>
+		<managed-property>
+			<property-name>projectTypeService</property-name>
+			<value>#{projectTypeService}</value>
+		</managed-property>
+	</managed-bean>
+
+
+
+	<managed-bean>
+		<managed-bean-name>addProjectToEmployeeBacking</managed-bean-name>
+		<managed-bean-class>com.abdelaziz.backing.AddProjectToEmployeeBacking</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
+		<managed-property>
+			<property-name>employeeService</property-name>
+			<value>#{employeeService}</value>
+		</managed-property>
+		<managed-property>
+			<property-name>projectService</property-name>
+			<value>#{projectService}</value>
+		</managed-property>
+	</managed-bean>
+
+
+	<managed-bean>
+		<managed-bean-name>addEmployeeToProjectBacking</managed-bean-name>
+		<managed-bean-class>com.abdelaziz.backing.AddEmployeeToProjectBacking</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
+		<managed-property>
+			<property-name>employeeService</property-name>
+			<value>#{employeeService}</value>
+		</managed-property>
+		<managed-property>
+			<property-name>projectService</property-name>
+			<value>#{projectService}</value>
+		</managed-property>
+	</managed-bean>
+
+
+	<managed-bean>
+		<managed-bean-name>projectManagedBean</managed-bean-name>
+		<managed-bean-class>com.abdelaziz.backing.ProjectManagedBean</managed-bean-class>
+		<managed-bean-scope>view</managed-bean-scope>
+		<managed-property>
+			<property-name>projectService</property-name>
+			<value>#{projectService}</value>
+		</managed-property>
+		<managed-property>
+			<property-name>projectTypeService</property-name>
+			<value>#{projectTypeService}</value>
+		</managed-property>
+	</managed-bean>
+
+
+
+	<managed-bean>
+		<managed-bean-name>navigationManagedBean</managed-bean-name>
+		<managed-bean-class>com.abdelaziz.backing.NavigationManagedBean</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
+	</managed-bean>
+
+
+	<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+
+
+	<navigation-rule>
+		<from-view-id>*</from-view-id>
+
+		<navigation-case>
+			<from-action>#{navigationManagedBean.processAddEmployeePage()}</from-action>
+			<from-outcome>/employee/addemployee</from-outcome>
+			<to-view-id>/employee/addemployee.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+
+		<navigation-case>
+			<from-action>#{navigationManagedBean.processAddProjectPage()}</from-action>
+			<from-outcome>/project/addproject</from-outcome>
+			<to-view-id>/project/addproject.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+
+		<navigation-case>
+			<from-action>#{navigationManagedBean.processListEmployeePage()}</from-action>
+			<from-outcome>/employee/listemployee</from-outcome>
+			<to-view-id>/employee/listemployee.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+
+		<navigation-case>
+			<from-action>#{navigationManagedBean.processListProjectPage()}</from-action>
+			<from-outcome>/project/listproject</from-outcome>
+			<to-view-id>/project/listproject.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+
+		<navigation-case>
+			<from-action>#{navigationManagedBean.processProjectTypePage()}</from-action>
+			<from-outcome>/project/listprojecttypes</from-outcome>
+			<to-view-id>/project/listprojecttypes.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+
+		<navigation-case>
+			<from-action>#{navigationManagedBean.processJobPositionPage()}</from-action>
+			<from-outcome>/employee/listjobpositions</from-outcome>
+			<to-view-id>/employee/listjobpositions.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+
+		<navigation-case>
+			<from-outcome>index</from-outcome>
+			<to-view-id>/index.xhtml</to-view-id>
+		</navigation-case>
+
+
+	</navigation-rule>
+
+
+	<navigation-rule>
+		<from-view-id>/employee/addemployee.xhtml</from-view-id>
+		<navigation-case>
+			<from-action>#{employeeManagedBean.addEmployee()}</from-action>
+			<from-outcome>sucess</from-outcome>
+			<to-view-id>/employee/listemployee.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+	</navigation-rule>
+
+
+	<navigation-rule>
+		<from-view-id>*</from-view-id>
+		<navigation-case>
+			<from-outcome>correct</from-outcome>
+			<to-view-id>/index.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>logout</from-outcome>
+			<to-view-id>/login.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+	</navigation-rule>
+
+
+
+
+
+
+
+	<navigation-rule>
+		<from-view-id>/project/addproject.xhtml</from-view-id>
+		<navigation-case>
+			<from-action>#{projectManagedBean.addProject()}</from-action>
+			<from-outcome>sucess</from-outcome>
+			<to-view-id>/project/listproject.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+	</navigation-rule>
+
+
+	<navigation-rule>
+		<from-view-id>/employee/listemployee.xhtml</from-view-id>
+		<navigation-case>
+			<from-outcome>/employee/addemployee</from-outcome>
+			<to-view-id>/employee/addemployee.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+	</navigation-rule>
+
+
+	<navigation-rule>
+		<from-view-id>/project/listproject.xhtml</from-view-id>
+		<navigation-case>
+			<from-action>#{navigationManagedBean.processAddProjectPage()}</from-action>
+			<from-outcome>/project/addproject</from-outcome>
+			<to-view-id>/project/addproject.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+	</navigation-rule>
+
+
+	<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+
+
+	<application>
+		<el-resolver>org.springframework.web.jsf.el.SpringBeanFacesELResolver</el-resolver>
+		<action-listener>org.primefaces.application.DialogActionListener</action-listener>
+		<navigation-handler>org.primefaces.application.DialogNavigationHandler</navigation-handler>
+		<view-handler>org.primefaces.application.DialogViewHandler</view-handler>
+	</application>
+</faces-config>
